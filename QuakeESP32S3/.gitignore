@@ -1,0 +1,10 @@
+build/
+sdkconfig
+sdkconfig.old
+sdkconfig.esp32s3
+.pio/
+managed_components/
+dependencies.lock
+# converted retail game data: not redistributable
+release/*.PAK
+release/*.pak

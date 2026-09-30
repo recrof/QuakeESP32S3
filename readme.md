@@ -1,112 +1,221 @@
+# Quake for ESP32-S3
 
-# MG24Quake: a Quake Port to Silicon Labs EFR32MG24/MGM240 devices requiring only 276 kB RAM!
+A port of [MG24Quake](https://github.com/next-hack/MG24Quake), Nicola Wrachien's Quake port for
+Silicon Labs EFR32MG24 microcontrollers (276 kB RAM), to the ESP32-S3. It runs the **full retail
+Quake** on the [Seeed Wio Tracker L2 / L2 Pro](https://wiki.seeedstudio.com/meshtastic_wio_tracker_l2_intro/)
+with its touch screen, speaker and microSD card, and supports Bluetooth LE keyboards, mice and
+gamepads. Other ESP32-S3 boards with PSRAM, a 320x240 SPI display and an SD card can be
+configured in [`board_config.h`](QuakeESP32S3/main/board_config.h).
 
-Release 2.0.
+Based on WinQuake/SDLQuake by id Software, MG24 port by Nicola Wrachien (next-hack). The
+technical background of the engine is described in the next-hack articles:
 
-**Version 2.0 UPDATE! Now supporting the FULL retail game episodes!** 
-**NOTE!** Starting from release 2.0 we have modified the PAK0.PAK data structure, so you must reconvert the PAK0.PAK (+ PAK1.PAK if you have) and then reupload it. If you don't, the game will crash. There is no check for now.
-
----
-
-This is a port to two simple open-source handheld gaming consoles, based on the Sparkfun Things Plus Matter and Arduino Nano Matter boards. 
-It does not require external RAM: it uses just the embedded RAM regions (256 kB +  20kB). Two external flash ICs are used to store the PAK0.PAK data file.
-
-Based on WinQuake/SDLQuake. Port by Nicola Wrachien.
-
-For more information visit the technical article on: https://next-hack.com/index.php/2024/09/22/quake-port-to-sparkfun-and-arduino-nano-matter-boards-using-only-276-kb-ram/.
-
-For more information about running the full retail Quake, read the new article: https://next-hack.com/index.php/2024/11/02/now-even-the-full-retail-quake-version-runs-on-the-arduino-nano-matter-board-and-it-is-faster-as-well/.
+- [Quake port to Sparkfun and Arduino Nano Matter boards using only 276 kB RAM](https://next-hack.com/index.php/2024/09/22/quake-port-to-sparkfun-and-arduino-nano-matter-boards-using-only-276-kb-ram/)
+- [Now even the full retail Quake runs on the Arduino Nano Matter board](https://next-hack.com/index.php/2024/11/02/now-even-the-full-retail-quake-version-runs-on-the-arduino-nano-matter-board-and-it-is-faster-as-well/)
 
 ## Features
 
- - Full Quake engine implementation
-	 - Static and dynamic lightings with bilinear interpolation
-	 - Gouraud shading on enemies
-	 - Animated sky
-	 - Turbulent surfaces (water, teleport, etc.)
-	 - Underwater warp effect.
-	 - Particles for smoke, blood, etc.
- - Resolution: 320 x 200 pixels (Quake default resolution)
- - Full game-logic including:
-	 - Monster AI/behaviors.
-	 - Teleports.
-	 - Triggers.
-	 - Doors.
-	 - Etc.
- - Sound:
-	 -  8 bit stereo, 11025 Hz.
-	 - Static, ambient and dynamic sound support.
- - Console with cheats.
- - Options (saved on external flash), with keyboard remapping.
- - Savegames; full game state support.
- - All the shareware levels supported, including skill/episode selection map.
- - **NEW FROM RELEASE 2.0** Retail levels are supported as well! (Require using 32 MB flash ICs, for a total of 64 MB).
- - current demo3 timedemo score: ~29.2 fps, with instantaneous fps (1/frame time) ranging from 18.2 to 47.8 fps (note that in-game instantaneous and average framerate might be higher or lower, depending on various factors, such as scene complexity, number of used channel sounds, dynamic lights, particles, map-size, and on-screen enemies).
-
+- Full Quake engine (MG24Quake 2.0):
+  - static and dynamic lighting with bilinear interpolation, Gouraud shading on enemies;
+  - animated sky, turbulent surfaces (water, teleports…), underwater warp effect;
+  - particles for smoke, blood, etc.
+- 320x200 rendering (Quake's default resolution), stretched to the full 320x240 screen (the
+  4:3 aspect ratio of the original monitors).
+- Full game logic: monster AI, teleports, triggers, doors…
+- Shareware and **full retail** episodes, including the skill/episode selection map.
+- Sound: 8 bit stereo, 11025 Hz; static, ambient and dynamic sounds.
+- Console with cheats, options with key remapping, savegames with full game state.
+- Touch screen controls with multi-touch; Bluetooth LE keyboards, mice and gamepads.
+- About 18 fps on the Wio Tracker L2 (ESP32-S3 at 240 MHz).
 
 ## Limitations
-- ~~Only Shareware Quake supported. (retail version NOT supported)~~ <---- **LIMITATION REMOVED! FULL RETAIL GAME IS SUPPORTED!!!**
-- No CD audio supported
-- Screen size fixed. The Status bar can't be reduced/removed.
-- No music. 
-- No Multiplayer.
 
+- No CD audio / music.
+- No multiplayer.
+- Fixed screen size: the status bar can't be reduced or removed.
+- Bluetooth LE only (the ESP32-S3 has no Bluetooth Classic), one Bluetooth device at a time.
+- The 2021 remaster `pak0.pak` is not supported: use the original (1.06) PAK files.
 
-## Supported Boards
- - The Gamepad (described in [this article on next-hack.com](https://next-hack.com/index.php/2024/09/21/the-gamepad-an-open-source-diy-handheld-gaming-console)), based on [Arduino Nano Matter Community Preview Board](https://store.arduino.cc/en-hu/pages/nano-matter).
- - SparkDoom (described in [this article on next-hack.com](https://next-hack.com/index.php/2023/12/10/multiplayer-doom-on-the-sparkfun-thing-plus-matter-board/)), based on [Sparkfun Thing Plus Matter - MGM240P board](https://www.sparkfun.com/products/20270). **Note that you need 16 MB flash ICs instead of 8 MB!**
- 
-**You can easily add support to more boards by editing boards.h and creating new build configurations.**
- 
- ## Build and programming
- 
-See article: https://next-hack.com/index.php/2024/09/22/quake-port-to-sparkfun-and-arduino-nano-matter-boards-using-only-276-kb-ram/
+## Quick start (Wio Tracker L2)
 
-## PAK file upload
+You need the firmware image (`QuakeESP32S3-wio-tracker-l2.bin`, from the GitHub releases or
+built as described below) and your own copy of Quake: the shareware `pak0.pak`, or the retail
+`pak0.pak` + `pak1.pak`.
 
+1. Convert the PAK files (see [PAK file](#pak-file)) and copy the result to the root of a
+   FAT32-formatted microSD card as `PAK0.PAK`. Insert the card in the L2.
+2. Flash the firmware. The L2 appears as a USB serial port; if flashing fails, hold BOOT while
+   pressing RESET to enter download mode.
 
-You need at least the shareware PAK0.PAK. Just google for it! 
-If you want to support the full retail game, you must also have the retail PAK1.PAK.
+   ```sh
+   esptool.py --chip esp32s3 -p <port> -b 921600 write_flash 0x0 QuakeESP32S3-wio-tracker-l2.bin
+   ```
 
-1. Put the PAK0.PAK (and the PAK1.PAK for full retail game support) in the same directory of the MCUPackConverter.exe (located in Tools/MCUPackConverter/Bin/Debug/).
-2. Execute MCUPackConverter.exe: this will vomit a lot of data onscreen, press any key when asked.
-3. You'll find on the same directory a new file, named PAK0Conv.PAK (there will be only one big PAK0Conv.PAK file, regardless if you have PAK1.PAK as well: the files are joined). 
-4. Put PAK0Conv.PAK to an SD card and rename it to PAK0.PAK.
-5. Then insert the SD Card in the Display board SD card holder, and reset the device, and follow on-screen directions to start the PAK0.PAK data copy operation. Note this will take 100 seconds for flash erase + about 2s per megabyte (i.e. if you have a retail game, you will have to wait 4 minutes).
+   This replaces the Meshtastic firmware. Back it up first if you want to go back
+   (`esptool.py -p <port> read_flash 0 0x1000000 backup.bin`).
+3. Press RESET. Boot messages appear on the screen and on the USB serial console.
 
-This is explained here: https://next-hack.com/index.php/2024/09/22/quake-port-to-sparkfun-and-arduino-nano-matter-boards-using-only-276-kb-ram/
+## Hardware
 
+| Item | Wio Tracker L2 | Generic board |
+|---|---|---|
+| MCU | ESP32-S3, 16 MB flash, 8 MB octal PSRAM | ESP32-S3 with PSRAM (8 MB recommended, e.g. N8R8 / N16R8), flash ≥ 4 MB |
+| Display | 3.2" 320x240 NV3031B, QSPI | 320x240 SPI LCD, ST7789 or ILI9341 |
+| Storage | microSD, SDMMC 1-bit | SD card (FAT), SPI or SDMMC (1/4 bit) |
+| Audio | ES8311 codec + speaker amplifier | optional I2S DAC/amplifier (MAX98357A, PCM5102…) or PDM on one pin |
+| Input | GT911 touch screen, BOOT and WAKE buttons, Bluetooth LE | Bluetooth LE, optional GPIO buttons |
 
-## Changelog
+On the L2, power rails, display reset and the touch controller are driven through the PCA9555
+GPIO expander, and the backlight through the LP5814 LED driver, all on the I2C bus (SDA 47,
+SCL 48). See [`esp_board_l2.c`](QuakeESP32S3/main/esp_board_l2.c).
 
-V2.0:
-- New features:
-	- **Added full support for retail episodes.**
-	- Support for 32 MB flash ICs (32 bits addressing). Total external flash size can be now as high as 1 GB.
-	- Faster same-level savegame load.
-	- **Speed improvement** due to possibility of caching colormap to Zone Memory and some model skins to internal flash. (Current demo3 timedemo performance is 29.2 fps).
-- Bugfixes:
-	- Added missing fields on some edicts. This did not increase memory consumption.
-	- Fixed memory fragmentation issue (this could be triggered only by console timedemo command in Windows build, or after introducing colormap caching).
-	- Fixed savegame loading issues, which might cause "internal flash memory overflow" issues.
-	- Fixed oldone boss health to make it fit into a signed short.
-	- Fixed SPI routines to support flash memories from BYTe semiconductor as well, which seem to have more critical timings.
-	- Fixed handling of external flash addresses.
-	- Fixed qcc_lip field size and sign, causing E3M2 lift not working.
-	- Added a "rand()" call just after the Z_zone initialization, so that the malloc_wrapper will be called first, allocating a non-releasable block (PU_WRAP) for it at the beginning of the static zone. 
-- Other changes
-	- Models now use index to string and not a full string, saving a lot of internal flash.
-	- Models now share the alias/brushmodel data pointers, with an union, saving 1 kB
-	- The surfaceNodeIndex array has been removed. Each of its element is now inside surface_t (there were 16 unused bits due to padding), saving up to 14kB of internal flash. 
-	- Increased Zone Memory by 9kB (decreased textureCacheBuffer to 20kB)
-	- The first 10k cachedEdgeOffsets are temporarily stored in the textureCacheBuffer, the remaining in Z-Buffer.
-	- Changed optimization flags on some files/directories, to improve code size.
-	- Remove unused multiplayer code (still not being optimized out because it referenced by some arrays and some - never reached - cases in the menu.
-	- Removed unused CVars and commands.
-	- Improved PAK0.PAK upload speed to 500kB/s.
-	  
-V1.1: 
--	Bugfixes:
-	-	fixed bug on particles (speed was not correct resulting to a shrunk cloud)
+Bluetooth: BLE keyboards and mice, Xbox Wireless controllers (firmware 5.x+), 8BitDo pads in
+BLE/Android mode and generic BLE gamepads work. Bluetooth Classic-only devices (DualShock 4,
+DualSense, most Switch Pro controllers, many older keyboards and mice) can't be used.
 
-V1.0: Initial release.
+## Controls
+
+### Touch screen
+
+Once the screen has been touched, the buttons are drawn over the 3D view. They are hidden again
+when a Bluetooth controller connects.
+
+| Area | In game | In menus / console |
+|---|---|---|
+| Left half | virtual stick, centered where the thumb lands: move / strafe | swipe = arrow keys |
+| Right half | drag to turn / look | swipe = arrow keys, tap = select |
+| Big circle, bottom right | fire (drag from it to aim while firing) | |
+| Middle circle, right | jump / swim up | |
+| Small circle, top right | next weapon | |
+| ☰ box, top left | menu | back |
+
+Move and look at the same time with two thumbs. Layout, stick radius and look speed are at the
+top of [`esp_touch.c`](QuakeESP32S3/main/esp_touch.c) and [`esp_input.c`](QuakeESP32S3/main/esp_input.c).
+
+### Board buttons (L2)
+
+BOOT opens the menu (escape); WAKE jumps in game and selects in menus.
+
+### Bluetooth LE keyboard, mouse and gamepad
+
+A keyboard behaves like a PC keyboard (default Quake bindings, console with `` ` ``). Mouse
+buttons are MOUSE1..3, the wheel is MWHEELUP/DOWN, and movement turns / looks.
+
+Gamepad (standard "Android" button layout):
+
+| Button | In game | In menus |
+|---|---|---|
+| Left stick | move / strafe | navigate |
+| Right stick | turn / look | |
+| D-pad | forward/back/turn (arrows) | navigate |
+| RT | fire | select |
+| LT | run | |
+| A | jump / swim up | select |
+| B | swim down | back |
+| X | next weapon | |
+| Y | scores | |
+| LB / RB | strafe left / right | |
+| Start / Home | menu | back |
+| Select | console | console |
+
+Button assignments are in the tables at the top of [`esp_input.c`](QuakeESP32S3/main/esp_input.c).
+
+**Pairing:** put the device in pairing mode, and disconnect it from any phone or computer it is
+paired with (or it will reconnect there). The ESP32-S3 keeps scanning for BLE HID devices, even
+during the game, and connects to the strongest one (bonded devices are preferred), reconnecting
+automatically. If a device is not found, set `BLE_HID_DEBUG` to 1 and check which advertisers
+the serial log shows. To forget bonds, erase the NVS partition (`idf.py erase-flash` also
+erases savegames).
+
+## PAK file
+
+The game data is read directly from the SD card, converted to the MG24Quake format (which
+changed in MG24Quake 2.0: PAK files converted for older releases must be converted again).
+
+1. Build the converter (or use the Windows executable in
+   `QuakeESP32S3/tools/MCUPackConverter/bin/Debug/`):
+
+   ```sh
+   cc -O2 -o MCUPackConverter QuakeESP32S3/tools/MCUPackConverter/*.c -lm
+   ```
+
+2. Run it in a directory containing `pak0.pak` (and the retail `pak1.pak`, if you have it). It
+   prints a lot of data and asks for a key press at the end. The result is a single
+   `PAK0Conv.PAK`: `pak0` and `pak1` are joined.
+3. Copy `PAK0Conv.PAK` to the root of the SD card as `PAK0.PAK`.
+
+## Building
+
+With ESP-IDF 5.5 installed and exported:
+
+```sh
+cd QuakeESP32S3
+idf.py set-target esp32s3
+idf.py build flash monitor
+```
+
+To create the merged image for a release:
+
+```sh
+cd QuakeESP32S3/build
+esptool.py --chip esp32s3 merge_bin -o QuakeESP32S3-wio-tracker-l2.bin @flash_args
+```
+
+`platformio.ini` is provided for PlatformIO users (pioarduino platform, ESP-IDF 5.5) but has
+not been tested.
+
+### Configuration
+
+Select the board with `BOARD` in [`board_config.h`](QuakeESP32S3/main/board_config.h)
+(`BOARD_WIO_TRACKER_L2` by default, or `BOARD_GENERIC`). For a generic board set the display
+SPI pins, controller type, `DISPLAY_MADCTL` (orientation) and color inversion, the SD card mode
+and pins (the card can share the display SPI bus, at the cost of some speed), the audio output
+and the optional GPIO buttons.
+
+The default `sdkconfig.defaults` is for **octal PSRAM** modules (N8R8, N16R8). For quad PSRAM
+modules (e.g. N8R2) replace `CONFIG_SPIRAM_MODE_OCT=y` with `CONFIG_SPIRAM_MODE_QUAD=y`.
+
+| Option | Default | |
+|---|---|---|
+| `DISPLAY_STRETCH_TO_FULL_HEIGHT` | 1 | stretch 320x200 to 320x240; 0 = 1:1 pixels with black bars |
+| `TOUCH_CONTROLS_ENABLED` | 1 | on-screen controls on boards with a touch controller |
+| `TOUCH_SWAP_XY`, `TOUCH_INVERT_X/Y` | L2 values | touch to screen coordinate mapping |
+| `TOUCH_DEBUG` | 0 | log raw touch coordinates |
+| `BLE_HID_ENABLED` | 1 | Bluetooth LE HID host |
+| `BLE_HID_DEBUG` | 0 | log every nearby BLE advertiser while scanning |
+
+The L2 speaker volume is set by ES8311 register `0x32` in `boardAudioCodecInit()`
+([`esp_board_l2.c`](QuakeESP32S3/main/esp_board_l2.c), 0.5 dB steps, `0xBF` = 0 dB; the
+default is -14 dB).
+
+## Repository layout
+
+| Path | Contents |
+|---|---|
+| `QuakeESP32S3/main` | ESP32-S3 platform code: display, SD/PAK access, audio, input, touch, Bluetooth, board support |
+| `QuakeESP32S3/main/port` | headers replacing the MG24 platform headers used by the engine |
+| `QuakeESP32S3/quake` | the MG24Quake engine; ESP32 code paths are selected with `ESP_PLATFORM` |
+| `QuakeESP32S3/tools/MCUPackConverter` | PAK converter |
+| `QuakeESP32S3/tools/QuakeCConverter`, `FunctionArrayCreator`, `QTablesGenerator` | MG24Quake tools that generate engine sources (QuakeC progs, field accessors, lookup tables); only needed to change the game code |
+
+## How it works
+
+| MG24 | ESP32-S3 |
+|---|---|
+| PAK in 2 interleaved SPI flash chips, read with DMA | PAK read from the SD card in 8 kB blocks, cached in PSRAM (all free PSRAM, CLOCK replacement). Asynchronous reads complete immediately. |
+| Savegames/settings at the end of the SPI flash | `quakenvm` flash partition, mapped at the same virtual address |
+| Internal flash used as model/skin cache | 1 MB PSRAM buffer (`INTERNAL_FLASH_CACHE_SIZE`) |
+| 20 kB auxiliary radio RAM (`AUX_SECTION`) | PSRAM |
+| ARM inline assembly in the rasterizer | the portable C code paths (the ones used by the MG24 Windows build) |
+| Display LDMA with progressive refresh | display task on core 0 converts the 8-bit frame through the palette (stretching it to 240 lines and drawing the touch overlay) and sends it by SPI/QSPI DMA, updating the same "lines sent" counter the renderer waits on |
+| Audio DAC + LDMA ring buffer | audio task playing the same ring buffer through I2S |
+
+The game runs on core 1 and never yields; display, audio, touch and Bluetooth run on core 0.
+
+## License
+
+GPL v2, see [LICENSE](LICENSE). The tiny printf implementation
+([`printf.c`](QuakeESP32S3/main/printf.c), Marco Paland) is MIT licensed.
+
+Quake game data (PAK files) is not included and is not covered by this license: you need your
+own copy of the game (the shareware `pak0.pak` is freely distributable).
