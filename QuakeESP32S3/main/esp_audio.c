@@ -50,8 +50,8 @@ static void audioTask(void *arg)
         for (int i = 0; i < AUDIO_CHUNK_FRAMES; i++)
         {
             uint32_t f = ((idx + i) & (AUDIO_BUFFER_LENGTH - 1)) * 2;
-            out[2 * i] = (int16_t) ((in[f] - 128) << 8);
-            out[2 * i + 1] = (int16_t) ((in[f + 1] - 128) << 8);
+            out[2 * i] = (int16_t) ((in[f] - 128) << AUDIO_SAMPLE_SHIFT);
+            out[2 * i + 1] = (int16_t) ((in[f + 1] - 128) << AUDIO_SAMPLE_SHIFT);
         }
         playIndex = (idx + AUDIO_CHUNK_FRAMES) & (AUDIO_BUFFER_LENGTH - 1);
         size_t written;

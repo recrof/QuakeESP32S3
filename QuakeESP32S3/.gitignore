@@ -8,3 +8,4 @@ dependencies.lock
 # converted retail game data: not redistributable
 release/*.PAK
 release/*.pak
+build-*/

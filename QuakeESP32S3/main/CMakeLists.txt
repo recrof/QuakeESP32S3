@@ -18,6 +18,7 @@ idf_component_register(
         esp_hid_parser.c
         esp_ble_hid.c
         esp_board_l2.c
+        esp_board_tdeck.c
         esp_printf.c
     INCLUDE_DIRS
         port
@@ -49,4 +50,8 @@ set_source_files_properties(${QUAKE_SRCS} PROPERTIES COMPILE_OPTIONS
 # portable C code is used; -O3 lets the compiler unswitch/unroll the per-pixel loops.
 set_source_files_properties(${QUAKE_DIR}/d_scan.c ${QUAKE_DIR}/d_polyse.c PROPERTIES COMPILE_OPTIONS
     "-O3;-fpermissive;-Wno-error;-w;-fno-strict-aliasing")
+# Board selection from the command line: idf.py -DBOARD=BOARD_LILYGO_TDECK ...
+if(DEFINED BOARD)
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE BOARD=${BOARD})
+endif()
 target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-error=unused-variable -Wno-error=unused-function)

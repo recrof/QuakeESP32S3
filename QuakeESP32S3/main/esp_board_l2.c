@@ -358,7 +358,7 @@ int boardTouchRead(boardTouchPoint_t *points)
     return n;
 }
 
-#else
+#elif BOARD == BOARD_GENERIC
 void boardInit(void)
 {
 }

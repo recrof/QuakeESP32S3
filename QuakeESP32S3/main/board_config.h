@@ -17,6 +17,8 @@
 
 #define BOARD_GENERIC                   0
 #define BOARD_WIO_TRACKER_L2            1       // Seeed Wio Tracker L2 / L2 Pro
+#define BOARD_LILYGO_TDECK              2       // LilyGO T-Deck / T-Deck Plus
+// Also selectable at build time: idf.py -B build-tdeck -DBOARD=BOARD_LILYGO_TDECK build
 #ifndef BOARD
 #define BOARD                           BOARD_WIO_TRACKER_L2
 #endif
@@ -100,6 +102,68 @@
 #define BUTTON_PIN_WEAPON               -1
 #define BUTTON_PIN_MENU                 0       // BOOT button: menu / escape
 
+#elif BOARD == BOARD_LILYGO_TDECK
+// -----------------------------------------------------------------------------
+// LilyGO T-Deck: ESP32-S3 (16 MB flash, 8 MB octal PSRAM), 2.8" 320x240 ST7789,
+// microSD on the display SPI bus, MAX98357A I2S amplifier, ESP32-C3 keyboard
+// controller (I2C) and trackball. See esp_board_tdeck.c.
+// -----------------------------------------------------------------------------
+#define DISPLAY_CONTROLLER              DISPLAY_CONTROLLER_ST7789
+#define DISPLAY_SPI_HOST                SPI2_HOST
+#define DISPLAY_SPI_CLOCK_HZ            (40 * 1000 * 1000)
+#define DISPLAY_PIN_MOSI                41
+#define DISPLAY_PIN_SCLK                40
+#define DISPLAY_PIN_CS                  12
+#define DISPLAY_PIN_DC                  11
+#define DISPLAY_PIN_RST                 -1
+#define DISPLAY_PIN_BACKLIGHT           42
+#define DISPLAY_BACKLIGHT_ON_LEVEL      1
+#define DISPLAY_MADCTL                  0x60    // landscape (MX | MV), RGB
+#define DISPLAY_INVERT_COLORS           1
+#define DISPLAY_X_OFFSET                0
+#define DISPLAY_Y_OFFSET                0
+
+// SD card on the display SPI bus (the LoRa radio is on it too, kept deselected)
+#define SD_MODE                         SD_MODE_SPI
+#define SD_SPI_HOST                     SPI2_HOST
+#define SD_SPI_CLOCK_KHZ                40000   // 20000 is used if mounting fails
+#define SD_SDMMC_CLOCK_KHZ              20000   // unused
+#define SD_PIN_MOSI                     41
+#define SD_PIN_MISO                     38
+#define SD_PIN_SCLK                     40
+#define SD_PIN_CS                       39
+#define SD_PIN_D1                       -1
+#define SD_PIN_D2                       -1
+#define SD_PIN_D3                       -1
+
+#define AUDIO_OUTPUT                    AUDIO_OUTPUT_I2S
+#define AUDIO_PIN_MCLK                  -1
+#define AUDIO_PIN_BCLK                  7
+#define AUDIO_PIN_WS                    5
+#define AUDIO_PIN_DOUT                  6
+#define AUDIO_PDM_PIN_CLK               -1
+#define AUDIO_SAMPLE_SHIFT              5       // the amplifier has no volume control: -18 dB
+
+#define BOARD_I2C_SDA                   18
+#define BOARD_I2C_SCL                   8
+#define BOARD_PIN_POWER_ON              10      // peripherals power (keyboard, display, radio...)
+#define BOARD_PIN_RADIO_CS              9
+#define TRACKBALL_PIN_UP                3
+#define TRACKBALL_PIN_DOWN              15
+#define TRACKBALL_PIN_LEFT              1
+#define TRACKBALL_PIN_RIGHT             2
+
+// Trackball click (BOOT, GPIO0): fire in game, select in menus. The keyboard is
+// handled in esp_board_tdeck.c.
+#define BUTTON_PIN_UP                   -1
+#define BUTTON_PIN_DOWN                 -1
+#define BUTTON_PIN_LEFT                 -1
+#define BUTTON_PIN_RIGHT                -1
+#define BUTTON_PIN_FIRE                 0
+#define BUTTON_PIN_JUMP                 -1
+#define BUTTON_PIN_WEAPON               -1
+#define BUTTON_PIN_MENU                 -1
+
 #else
 // -----------------------------------------------------------------------------
 // Generic board: 320x240 SPI panel (ST7789 or ILI9341), driven in landscape mode.
@@ -154,6 +218,10 @@
 #define BUTTON_PIN_JUMP                 -1
 #define BUTTON_PIN_WEAPON               -1
 #define BUTTON_PIN_MENU                 -1
+#endif
+
+#ifndef AUDIO_SAMPLE_SHIFT
+#define AUDIO_SAMPLE_SHIFT              8       // 8 bit mixer samples -> 16 bit output; lower = quieter (6 dB per step)
 #endif
 
 #define SD_MOUNT_POINT                  "/sd"

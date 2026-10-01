@@ -126,6 +126,12 @@ static esp_err_t mountSdCard(void)
     slot.gpio_cs = SD_PIN_CS;
     slot.host_id = SD_SPI_HOST;
     ret = esp_vfs_fat_sdspi_mount(SD_MOUNT_POINT, &host, &slot, &mountConfig, &card);
+    if (ret != ESP_OK && host.max_freq_khz > SDMMC_FREQ_DEFAULT)
+    {
+        ESP_LOGW(TAG, "SD mount failed at %d kHz (%s), retrying at %d kHz", host.max_freq_khz, esp_err_to_name(ret), SDMMC_FREQ_DEFAULT);
+        host.max_freq_khz = SDMMC_FREQ_DEFAULT;
+        ret = esp_vfs_fat_sdspi_mount(SD_MOUNT_POINT, &host, &slot, &mountConfig, &card);
+    }
 #else
     if (SD_PIN_MOSI < 0 || SD_PIN_MISO < 0 || SD_PIN_SCLK < 0)
     {

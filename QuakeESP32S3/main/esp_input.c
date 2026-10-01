@@ -10,6 +10,7 @@
  *   right = turn/look.
  * - BLE HID mice: buttons are MOUSE1..3, movement turns/looks.
  * - Touch screen: on-screen controls (esp_touch.c) feeding the virtual gamepad.
+ * - Board input devices (T-Deck keyboard and trackball, esp_board_tdeck.c).
  *
  * This replaces Sys_SendKeyEvents() and IN_*() of the MG24 vid_sdl.c.
  *
@@ -148,6 +149,15 @@ static const int8_t gpioButtons[] =
     [GP_L3] = -1, [GP_R3] = -1,
 };
 
+__attribute__((weak)) void boardInputInit(void)
+{
+}
+
+__attribute__((weak)) void boardTakeLook(float *dx, float *dy)
+{
+    *dx = *dy = 0;
+}
+
 void inputPushKey(int key, bool down)
 {
     if (!key)
@@ -176,6 +186,7 @@ void initKeyboard(void)
         gpio_config(&io);
     }
     touchInit();
+    boardInputInit();
 }
 
 void getKeys(uint16_t *keys)
@@ -593,6 +604,10 @@ void IN_Move(usercmd_t *cmd)
     float tsx, tsy, tdx, tdy;
     touchGetStick(&tsx, &tsy);
     touchTakeLook(&tdx, &tdy);
+    float bdx, bdy;
+    boardTakeLook(&bdx, &bdy);
+    tdx += bdx;
+    tdy += bdy;
     float lx = (stickLX + tsx) * sensitivity;
     float ly = (stickLY + tsy) * sensitivity;
     float rx = stickRX * sensitivity + mx * sensitivity * MOUSE_SCALE;

@@ -30,4 +30,9 @@ bool boardHasTouch(void);
 // Reads the touch points. Returns -1 if there is no new data, else the number of
 // points currently down (0 = all released).
 int boardTouchRead(boardTouchPoint_t *points);
+// Board specific input devices (T-Deck: keyboard, trackball). Optional: the
+// default implementations (esp_input.c) do nothing.
+void boardInputInit(void);
+// Look movement since the last call, in touch pixel units
+void boardTakeLook(float *dx, float *dy);
 #endif
